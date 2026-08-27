@@ -204,7 +204,8 @@ Return one relationship for every job requirement.
 def generate_interview_questions(
     candidate: CandidateProfile,
     job: JobProfile,
-    match_result: dict
+    match_result: dict,
+    interview_mode: str
 ) -> QuestionSet:
 
     prompt = f"""
@@ -221,6 +222,9 @@ JOB PROFILE:
 
 MATCH ANALYSIS:
 {match_result}
+
+INTERVIEW MODE:
+{interview_mode}
 
 Generate exactly 10 questions.
 
@@ -241,15 +245,32 @@ Distribute them across these categories:
 4. fundamentals
    General technical fundamentals relevant to the role.
 
-Guidelines:
+DIFFICULTY RULES:
+
+If the interview mode is "Easy → Medium":
+- Questions 1-5 must be easy.
+- Questions 6-10 must be medium.
+- Do not generate hard questions.
+
+If the interview mode is "Medium → Hard":
+- Questions 1-5 must be medium.
+- Questions 6-10 must be hard.
+- Do not generate easy questions.
+
+If the interview mode is "Adaptive":
+- Start with a reasonable mix of easy and medium questions.
+- These initial questions will later be replaced by adaptive
+  follow-up questions based on the candidate's performance.
+
+GENERAL GUIDELINES:
 - Questions must be specific to this candidate and role.
 - Do not invent projects, technologies, or experience.
 - Resume-based questions must be grounded in the candidate profile.
 - JD-gap questions should focus on genuine gaps from the match analysis.
 - Avoid duplicate questions.
-- Mix easy, medium, and hard questions.
 - Prefer questions that require explanation or reasoning rather
   than simple definitions.
+- The difficulty field must exactly match the requested difficulty.
 
 Return exactly 10 questions.
 """
@@ -331,6 +352,74 @@ Return a structured evaluation.
     return AnswerEvaluation.model_validate_json(
         response.text
     )
+
+def generate_follow_up_question(
+    question: InterviewQuestion,
+    answer: str,
+    evaluation: AnswerEvaluation,
+    candidate: CandidateProfile,
+    job: JobProfile,
+    next_difficulty: str,
+) -> InterviewQuestion:
+
+    prompt = f"""
+You are conducting an adaptive technical interview.
+
+The candidate has just answered a question.
+
+PREVIOUS QUESTION:
+{question.question}
+
+CATEGORY:
+{question.category}
+
+PREVIOUS ANSWER:
+{answer}
+
+EVALUATION:
+{evaluation.model_dump_json(indent=2)}
+
+CANDIDATE PROFILE:
+{candidate.model_dump_json(indent=2)}
+
+JOB PROFILE:
+{job.model_dump_json(indent=2)}
+
+The next question must have difficulty:
+{next_difficulty}
+
+Generate ONE follow-up interview question.
+
+Rules:
+- Build naturally on the previous question.
+- Use missing_concepts and improvements from the evaluation
+  when relevant.
+- Keep the question relevant to the candidate and target role.
+- Do not invent projects, technologies, or experience.
+- Do not simply repeat the previous question.
+- If the previous answer was weak, test the underlying concept
+  more simply.
+- If the previous answer was strong, probe deeper using
+  reasoning, trade-offs, implementation details, edge cases,
+  or design decisions.
+- Return exactly one question.
+"""
+
+    response = client.models.generate_content(
+        model=os.getenv("GEMINI_MODEL"),
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": InterviewQuestion,
+        },
+    )
+
+    return InterviewQuestion.model_validate_json(
+        response.text
+    )
+
+
+
 
 if __name__ == "__main__":
 
