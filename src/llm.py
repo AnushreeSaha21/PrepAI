@@ -228,22 +228,36 @@ INTERVIEW MODE:
 
 Generate exactly 10 questions.
 
-Distribute them across these categories:
+QUESTION ALLOCATION:
 
-1. resume_project
-   Questions specifically about projects or experience
-   mentioned in the candidate's resume.
+- 3 questions: resume_project
+- 3 questions: jd_technical
+- 2 questions: jd_gap
+- 2 questions: fundamentals
 
-2. jd_technical
-   Questions testing skills explicitly required by the
-   job description.
+RESUME/PROJECT COVERAGE:
+- Resume-based questions must use information explicitly present
+  in the candidate profile.
+- When the candidate has multiple relevant projects or experiences,
+  distribute the 3 resume_project questions across different
+  relevant projects when possible.
+- Do not generate all resume questions from the same project unless
+  that project is clearly the most relevant to the target role.
+- Prefer projects and experience that overlap with the job requirements.
 
-3. jd_gap
-   Questions targeting important required skills that are
-   missing or weak in the candidate profile.
+JD TECHNICAL:
+- Test skills explicitly required by the job description.
+- Prioritize the most important requirements for the target role.
 
-4. fundamentals
-   General technical fundamentals relevant to the role.
+JD GAPS:
+- Focus on important required skills that are missing or weak
+  according to the match analysis.
+- Do not treat a related skill as completely missing when the
+  candidate clearly demonstrates partial or broader coverage.
+
+FUNDAMENTALS:
+- Test foundational concepts relevant to the target role.
+- Avoid repeating concepts already covered by the other categories.
 
 DIFFICULTY RULES:
 
