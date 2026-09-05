@@ -567,7 +567,7 @@ to create a practical AI-powered interview preparation workflow.
 
 # 👨‍💻 Author
 
-**Your Name**
+**Anushree Saha**
 
 
 # 📜 License
