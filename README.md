@@ -569,12 +569,6 @@ to create a practical AI-powered interview preparation workflow.
 
 **Your Name**
 
-M.Tech — Computer Science & Engineering  
-IIT Gandhinagar
-
-GitHub: https://github.com/YOUR_USERNAME
-
----
 
 # 📜 License
 
